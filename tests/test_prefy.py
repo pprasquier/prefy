@@ -4,7 +4,7 @@ import tempfile
 import os
 import json
 
-from pyprefs.pyprefs import Settings
+from prefy.prefy import Settings
 
 TEST_DIR_PATH='temp'
 

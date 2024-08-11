@@ -1,8 +1,8 @@
-# pyprefs
+# prefy
 A library to streamline and standardize preference/settings management in Python projects
 
 # What is it?
-Pyprefs provides developpers with a systematic way to handle the settings of their projects. 
+Prefy provides developpers with a systematic way to handle the settings of their projects. 
 It addresses the following pain points: 
 - Losing/having to redefine one's own settings when pulling the new version of a project 
 - Differeniating the settings across multiple environments
@@ -12,7 +12,7 @@ It addresses the following pain points:
 - etc.
 
 # How does it work?
-Pyprefs translates settings into instances of **PyPClass** objects where each individual setting is an attribute that can hold only one value at any given time.
+Prefy translates settings into instances of **PyPClass** objects where each individual setting is an attribute that can hold only one value at any given time.
 In order to determine the list of settings and their corresponding values, it will go through directories where the settings are expressd in a fixed json format.   
 
 ## Defining a setting
@@ -29,19 +29,19 @@ Here is an example of a json object defining a setting. Note that the keys of th
     }
 ```
 ### Keys of the setting json object
-- **key**: the identifier of the setting. This will ultimately be created and transformed into an attribute of the **PyPClass** object instantiated by Pyprefs
+- **key**: the identifier of the setting. This will ultimately be created and transformed into an attribute of the **PyPClass** object instantiated by Prefy
 - **value**: the value of the setting. This will ultimately be the value of the above attribute. 
-- **description**: the description of the setting. This key is not handled by Pyprefs' code and is just used for human informational purposes. *Optional*.
-- **type**: the type of the setting.  This key is used for human informational purposes except for the reserved word "Pyprefs", which indicates that this setting is for internal use of Pyprefs processes. *Optional*.
+- **description**: the description of the setting. This key is not handled by Prefy' code and is just used for human informational purposes. *Optional*.
+- **type**: the type of the setting.  This key is used for human informational purposes except for the reserved word "Prefy", which indicates that this setting is for internal use of Prefy processes. *Optional*.
 - **restricted**: when true, indicates that this setting cannot be overwritten by other versions of it. (TODO) *Optional* 
-- **force_update**: when true, indicates that when accessing the setting, Pyprefs should always check its updated value in the settings files. This allows to change the value of a setting live. (TODO) *Optional* 
+- **force_update**: when true, indicates that when accessing the setting, Prefy should always check its updated value in the settings files. This allows to change the value of a setting live. (TODO) *Optional* 
 
 ## Defining different sets of settings
-The power of Pyprefs comes from its ability to determine the right value for a setting in the context of multiple potential scenarios/combinations.  In order to do so, Pyprefs expects the developers to specify those combinations through settings files. 
+The power of Prefy comes from its ability to determine the right value for a setting in the context of multiple potential scenarios/combinations.  In order to do so, Prefy expects the developers to specify those combinations through settings files. 
 Developers are free to choose the structure that best fits their needs provided that: 
 - All the settings to be attached to a single instance of a **PyPClass** object are defined within a single parent directory
 - Within a parent directory, a setting can be defined 1 or multiple times across different files. 
-- When instantiating the **PyPClass** object, Pyprefs will assign the last value found in the different files (sorted alphabeticaly) of a same directory to each setting
+- When instantiating the **PyPClass** object, Prefy will assign the last value found in the different files (sorted alphabeticaly) of a same directory to each setting
 
 Here is a settings file structure example:
 ```
@@ -79,7 +79,7 @@ For instance, assuming the following content of *0.DefaultLLM.json*, which is in
         "value":"gpt-3.5-turbo"
     }
 ```
-If a contributor to the project wants to specify a different model, they could change 0.DefaultLLM.json, but then, when pushing to the git repository, their own settings would become the standard settings. Instead, by using Pyprefs, they can just supersede specific settings by defining them in a new file within the same directory. For instance, this could be the content of *1.Mistral.json*:
+If a contributor to the project wants to specify a different model, they could change 0.DefaultLLM.json, but then, when pushing to the git repository, their own settings would become the standard settings. Instead, by using Prefy, they can just supersede specific settings by defining them in a new file within the same directory. For instance, this could be the content of *1.Mistral.json*:
  ``` json
     {
         "key":"insights_rag_base_url",
@@ -90,7 +90,7 @@ If a contributor to the project wants to specify a different model, they could c
         "value":"TheBloke/Mistral-7B-Instruct-v0.1-GGUF/mistral-7b-instruct-v0.1.Q2_K.gguf"
     }
 ```
-Since *1.Mistral.json* comes alphabetically after *0.DefaultLLM.json*, Pyprefs will use its content as the updated value for the settings *insights_rag_base_url* and *insights_rag_model_name*, while still maitaining the value for *insights_rag_temperature* defined in *0.DefaultLLM.json*. And by ignoring *1.Mistral.json* from the git sync, our developer guarantees that they will always be using their own version of the settings.
+Since *1.Mistral.json* comes alphabetically after *0.DefaultLLM.json*, Prefy will use its content as the updated value for the settings *insights_rag_base_url* and *insights_rag_model_name*, while still maitaining the value for *insights_rag_temperature* defined in *0.DefaultLLM.json*. And by ignoring *1.Mistral.json* from the git sync, our developer guarantees that they will always be using their own version of the settings.
 
 ## Accessing the settings from the code
 In order to access the current value of the settings in your code, you need to instantiate a **PyPClass** object for each of your settings directories and then access them as values. 

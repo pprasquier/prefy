@@ -11,7 +11,7 @@ VALUE="value"
 TYPE="type"
 
 #JSON values. Careful when changing as they are used in human-made documents
-INTERNAL_SETTINGS="Pyprefs"
+INTERNAL_SETTINGS="Prefy"
 
 #Reserved keys
 DEACTIVATE="deactivate_setting_file"
