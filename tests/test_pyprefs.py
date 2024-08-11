@@ -6,10 +6,6 @@ import json
 
 from pyprefs.pyprefs import Settings
 
-SETTINGS_DIR='settings_files'
-#Todo
-# Test invalid json file
-# test presence of settings_file directory
 TEST_DIR_PATH='temp'
 
 class TestSettings(unittest.TestCase):
@@ -24,7 +20,12 @@ class TestSettings(unittest.TestCase):
         with self.assertRaises(expected_exception=FileNotFoundError):
             Settings(TEST_DIR_PATH)
 
-                        
+ 
+    def test_default_directory_not_exists(self):
+        with self.assertRaises(expected_exception=OSError): #Assumes the default directory doesn't exist
+            Settings()
+
+                              
     def test_auto_settings(self):
     # Create temporary directory and JSON files
 

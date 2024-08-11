@@ -25,7 +25,7 @@ class Meta: #Info about this instance
             self.files_loaded=0
         
 class Settings:    
-    def __init__(self,directory_path):
+    def __init__(self,directory_path=DEFAULT_DIR):
         try:
             if not os.path.isdir(directory_path):
                 logging.error("Invalid directory: '{}'.".format(directory_path))
@@ -115,9 +115,9 @@ class Settings:
 
 class SettingsWrapper:
     #All classes should have a settings object
-    def __init__(self, settings=None):
+    def __init__(self, settings=None,directory_path=DEFAULT_DIR):
         if settings is None:
-            settings=Settings('settings_files')
+            settings=Settings(directory_path=directory_path)
             
         self.settings=settings
     
