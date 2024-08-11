@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "pyprefs"
+version = "0.1.0"
+description = "Library to streamline and manage settings and preferences"
+authors = ["pprasquier <pprasquier@oncallc.io>"]
+license = "Apache License 2.0"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+setuptools-scm = "^8.1.0"
+poetry-dynamic-versioning = "^1.4.0"
+
+
+[build-system]
+requires = ["poetry-core","setuptools>=42", "wheel"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry-dynamic-versioning]
+enable = true
+versioning = "git" 
