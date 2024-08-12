@@ -38,18 +38,18 @@ class TestSettings(unittest.TestCase):
         
         with open(json_file1, "w") as file:
             json.dump([
-                {"type": "Settings", "key": "deactivate_setting_file", "value": False},
+                {"type": "Prefy", "key": "deactivate_setting_file", "value": False},
                 {"type": "Embeddings", "key": "resume_dir_path", "value": "/path1"},
                 {"type": "Embeddings", "key": "insight_dir_path", "value": "/path1"},
             ], file)
         with open(json_file2, "w") as file:  # Should be found and its settings should supersde those of file 1
             json.dump([
-                {"type": "Settings", "key": "deactivate_setting_file", "value": False},
+                {"type": "Prefy", "key": "deactivate_setting_file", "value": False},
                 {"type": "Embeddings", "key": "insight_dir_path", "value": "/path2"}
             ], file)
         with open(json_file3, "w") as file: # Should be found but not loaded since it is deactivated
             json.dump([
-                {"type": "Settings", "key": "deactivate_setting_file", "value": True},
+                {"type": "Prefy", "key": "deactivate_setting_file", "value": True},
                 {"type": "Embeddings", "key": "resume_dir_path", "value": "/path3"}
             ], file)
         with open(json_file4, "w") as file: # Should be found but not loaded since it is not a valid json file

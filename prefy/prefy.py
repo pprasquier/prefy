@@ -74,7 +74,7 @@ class Preferences:
                         continue
                     
                     # Check if the file should be skipped
-                    deactivate_setting = any(record.get(KEY) == DEACTIVATE and record.get(VALUE) == True
+                    deactivate_setting = any(record.get(KEY) == DEACTIVATE and record.get(TYPE) == INTERNAL_SETTINGS and record.get(VALUE) == True
                                             for record in data)
                     if deactivate_setting:
                         continue

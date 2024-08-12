@@ -130,7 +130,7 @@ Let's assume that I want to fix a bug that on occurs with a specific set of pref
 In order to do so, I'll add the following object to the file: 
  ```json
      {
-        "type":"Preferences",
+        "type":"Prefy",
         "key": "deactivate_setting_file",
         "description": "When set to true, this file is not taken into account. Use it to easily juggle through different preferences configurations.",
         "value": true
