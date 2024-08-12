@@ -41,6 +41,8 @@ class TestSettings(unittest.TestCase):
                 {"type": "Prefy", "key": "deactivate_setting_file", "value": False},
                 {"type": "Embeddings", "key": "resume_dir_path", "value": "/path1"},
                 {"type": "Embeddings", "key": "insight_dir_path", "value": "/path1"},
+                {"type": "Embeddings", "key": "boolean", "value": True},  
+                {"type": "Embeddings", "key": "number", "value": 4}                 
             ], file)
         with open(json_file2, "w") as file:  # Should be found and its settings should supersde those of file 1
             json.dump([
@@ -62,6 +64,11 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(result.insight_dir_path, "/path2")
         self.assertEqual(result.resume_dir_path,"/path1")
         self.assertEqual(result.meta.files_found,4)
-        self.assertEqual(result.meta.files_loaded,2)       
+        self.assertEqual(result.meta.files_loaded,2)
+        self.assertTrue(result.boolean,"Failed to retrieve boolean value")
+        self.assertEqual(result.number,4,"Failed to retrieve number value")
+        with self.assertRaises(AttributeError):
+            result.inexisting_setting
+            
     def tearDown(self):
         shutil.rmtree(TEST_DIR_PATH)

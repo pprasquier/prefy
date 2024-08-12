@@ -74,7 +74,7 @@ class Preferences:
                         continue
                     
                     # Check if the file should be skipped
-                    deactivate_setting = any(record.get(KEY) == DEACTIVATE and record.get(TYPE) == INTERNAL_SETTINGS and record.get(VALUE) == True
+                    deactivate_setting = any(record.get(KEY) == DEACTIVATE and record.get(VALUE) == True
                                             for record in data)
                     if deactivate_setting:
                         continue
@@ -112,6 +112,13 @@ class Preferences:
     def __repr__(self):
         attributes = ", ".join(f"{key}={value}" for key, value in vars(self).items())
         return f"{{{attributes}}}"
+    
+    def __getattr__(self,name):
+        try:
+            super(self).__getattr__(name)
+        except Exception as e:
+            logging.warning("Unknown attribute with name '{}'. Add an element with this key to the list of attributes in a JSON file within directory '{}'.".format(name,self.meta.directory_path))
+            raise AttributeError
 
 class PreferencesWrapper:
     #All classes should have a settings object
