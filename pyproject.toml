@@ -18,4 +18,4 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry-dynamic-versioning]
 enable = true
-versioning = "git" 
+vcs = "git" 
