@@ -1,15 +1,17 @@
 # prefy
-A library to streamline and standardize preference/preferences management in Python projects
+Prefy is a Python library designed to streamline and standardize preference management in projects. It provides a systematic approach to handling preferences across different scenarios, users, and environments.
+
 
 # What is it?
-Prefy provides developpers with a systematic way to handle the preferences of their projects. 
+Prefy provides developpers with a systematic way to handle the preferences of their projects across scenarios/users/environments. 
 It addresses the following pain points: 
 - Losing/having to redefine one's own preferences when pulling the new version of a project 
 - Differeniating the preferences across multiple environments
 - Testing the project through different combinations of preferences (i.e., different LLMs, etc.)
-- Finding the right preferences across different locations
+- Finding the right setting across different locations
 - Differentiating between default and custom preferences
-- etc.
+- Running different configuration scenarios concurrently without hardcoding
+- And much more   
 
 # How does it work?
 Prefy translates preferences into instances of **Preferences** objects where each individual setting is an attribute that can hold only one value at any given time.

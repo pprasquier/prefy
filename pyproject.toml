@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "prefy"
 version = "0.1.0"
-description = "Library to streamline and manage settings and preferences"
+description = "Streamline the management of your project's preferences through standardized json files."
 authors = ["pprasquier <pprasquier@oncallc.io>"]
 license = "Apache License 2.0"
 readme = "README.md"
