@@ -4,7 +4,7 @@ import tempfile
 import os
 import json
 
-from prefy.prefy import Settings
+from prefy.prefy import Preferences
 
 TEST_DIR_PATH='temp'
 
@@ -14,16 +14,16 @@ class TestSettings(unittest.TestCase):
     
     def test_invalid_directory(self):
         with self.assertRaises(expected_exception=OSError):
-            Settings('non_existent_directory')
+            Preferences('non_existent_directory')
 
     def test_empty_directory(self):
         with self.assertRaises(expected_exception=FileNotFoundError):
-            Settings(TEST_DIR_PATH)
+            Preferences(TEST_DIR_PATH)
 
  
     def test_default_directory_not_exists(self):
         with self.assertRaises(expected_exception=OSError): #Assumes the default directory doesn't exist
-            Settings()
+            Preferences()
 
                               
     def test_auto_settings(self):
@@ -56,7 +56,7 @@ class TestSettings(unittest.TestCase):
             file.write("Hello, World!\n")
 
         # Call the function
-        result = Settings(tmpdirname)
+        result = Preferences(tmpdirname)
 
         # Verify the result
         self.assertEqual(result.insight_dir_path, "/path2")

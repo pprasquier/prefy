@@ -24,7 +24,7 @@ class Meta: #Info about this instance
             self.files_found=0
             self.files_loaded=0
         
-class Settings:    
+class Preferences:    
     def __init__(self,directory_path=DEFAULT_DIR):
         try:
             if not os.path.isdir(directory_path):
@@ -113,11 +113,11 @@ class Settings:
         attributes = ", ".join(f"{key}={value}" for key, value in vars(self).items())
         return f"{{{attributes}}}"
 
-class SettingsWrapper:
+class PreferencesWrapper:
     #All classes should have a settings object
     def __init__(self, settings=None,directory_path=DEFAULT_DIR):
         if settings is None:
-            settings=Settings(directory_path=directory_path)
+            settings=Preferences(directory_path=directory_path)
             
         self.settings=settings
     
