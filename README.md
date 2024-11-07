@@ -15,7 +15,7 @@ It addresses the following pain points:
 
 # How does it work?
 Prefy translates preferences into instances of **Preferences** objects where each individual setting is an attribute that can hold only one value at any given time.
-In order to determine the list of preferences and their corresponding values, it will go through directories where the preferences are expressd in a fixed json format.   
+In order to determine the list of preferences and their corresponding values, it will go through directories where the settings are defined in a fixed json format.   
 
 ## Defining a setting
 Adding a setting to a project only requires adding a json object to a file placed in a preferences directory. 
@@ -27,7 +27,7 @@ Here is an example of a json object defining a setting. Note that the keys of th
         "description":"Parent path to the folder where resume embeddings are stored.",
         "type":"Embeddings",
         "restricted":true,
-        "force_update":true,
+        "force_update":false,
     }
 ```
 ### Keys of the setting json object
@@ -35,8 +35,8 @@ Here is an example of a json object defining a setting. Note that the keys of th
 - **value**: the value of the setting. This will ultimately be the value of the above attribute. 
 - **description**: the description of the setting. This key is not handled by Prefy' code and is just used for human informational purposes. *Optional*.
 - **type**: the type of the setting.  This key is used for human informational purposes except for the reserved word "Prefy", which indicates that this setting is for internal use of Prefy processes. *Optional*.
-- **restricted**: when true, indicates that this setting cannot be overwritten by other versions of it. (TODO) *Optional* 
-- **force_update**: when true, indicates that when accessing the setting, Prefy should always check its updated value in the preferences files. This allows to change the value of a setting live. (TODO) *Optional* 
+- **restricted**: when true, indicates that this setting cannot be overwritten by other versions of it. (WIP) *Optional* 
+- **force_update**: when true, indicates that when accessing the setting, Prefy will force a refresh of the Preferences to account for changes since they have last been loaded. This allows to change the value of a setting in live conditions. Default=false *Optional* 
 
 ## Defining different sets of preferences
 The power of Prefy comes from its ability to determine the right value for a setting in the context of multiple potential scenarios/combinations.  In order to do so, Prefy expects the developers to specify those combinations through preferences files. 
@@ -128,7 +128,7 @@ vector_store=VectorStore(store_path=app_prefs.embeddings_path,sentence_transform
 
 # Addtional features
 ### Excluding files manually
-Let's assume that I want to fix a bug that on occurs with a specific set of preferences. Instead of changing my preferred preferences to replicte the but, I can simply create a new file with the appropriate preferences and give it the highest priority by giving it a filename starting with "ZZZ", for instance. When I'm done working with this configuration, an easy way to go back to my preferred preferences without losing the option to come back to this configuration in the future and preventing it from interfering with my regular preferences is to exclude this file from the **Preferences** instantiation process. 
+Let's assume that I want to fix a bug that occurs with a specific set of preferences. Instead of changing my preferred preferences to replicte the but, I can simply create a new file with the appropriate preferences and give it the highest priority by giving it a filename starting with "ZZZ", for instance. When I'm done working with this configuration, an easy way to go back to my preferred preferences without losing the option to come back to this configuration in the future and preventing it from interfering with my regular preferences is to exclude this file from the **Preferences** instantiation process. 
 In order to do so, I'll add the following object to the file: 
  ```json
      {
@@ -142,7 +142,12 @@ In order to do so, I'll add the following object to the file:
 WIP
 
 ### Forcing updates
-WIP
+You can change the preferences on the fly without having to restart your app or worrying about specifying intervals or checkpoints to load data from the Preferences files. In order to do so, you just need to mark a setting as 
+```json
+"force_update":true
+``` 
+This will trigger the update of the Preference object on which the setting is stored each time this setting is read accessed by your application.
+Be aware that this refreshes all settings to their most recent value and may add unnecessary load on your app, therefore only use it in scenarios where it is relevant.  
 
 ### Environment variables integration
 WIP

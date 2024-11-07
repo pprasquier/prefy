@@ -9,6 +9,8 @@ DEFAULT_DIR='settings_files'
 KEY="key"
 VALUE="value"
 TYPE="type"
+FORCE_FIELD_UPDATE="force_update"
+RESTRICTED="restricted"
 
 #JSON values. Careful when changing as they are used in human-made documents
 INTERNAL_SETTINGS="Prefy"
@@ -23,6 +25,7 @@ class Meta: #Info about this instance
             self.files=[]
             self.files_found=0
             self.files_loaded=0
+            self.updateable_fields=[]
         
 class Preferences:    
     def __init__(self,directory_path=DEFAULT_DIR):
@@ -84,6 +87,17 @@ class Preferences:
                     # TODO: Add logic to prevent overwriting existing settings when restricted=true 
                     # TODO: Add logic to force update when force_update=true 
                     for record in data:
+                        
+                        # Add updateable settings to a list
+                        if check_boolean_property_value(record,FORCE_FIELD_UPDATE):
+                            self.meta.updateable_fields.append(record.get(KEY))
+                        else:
+                            try:
+                                self.meta.updateable_fields.remove(record.get(KEY))
+                            except ValueError:
+                                pass
+                            
+                        #Upsert settings to Preferences   
                         if record.get(TYPE) != INTERNAL_SETTINGS: 
                             key = record.get(KEY)
                             value = record.get(VALUE)
@@ -94,8 +108,8 @@ class Preferences:
         
         except Exception as e:
             logging.error('Error {} .'.format(e))
-            raise Exception
-    
+            raise Exception 
+        
     def check_setting_value(self,setting_name):
         #Display the current value of a setting
          try:
@@ -108,17 +122,34 @@ class Preferences:
          except Exception as e:
             logging.error('Error {} .'.format(e))
             raise Exception
-    
+        
+    def check_attribute_updateable(self, name):
+        if name in self.meta.updateable_fields:
+            self.refresh(force_update=True)
+            return True
+        else:
+            return False
+
     def __repr__(self):
         attributes = ", ".join(f"{key}={value}" for key, value in vars(self).items())
         return f"{{{attributes}}}"
-    
-    def __getattr__(self,name):
+     
+    def __getattribute__(self,name):
         try:
-            super(self).__getattr__(name)
+            if name != 'meta' and name != 'check_attribute_updateable':
+                self.check_attribute_updateable(name)
+            return super().__getattribute__(name)
         except Exception as e:
-            logging.warning("Unknown attribute with name '{}'. Add an element with this key to the list of attributes in a JSON file within directory '{}'.".format(name,self.meta.directory_path))
+            logging.warning("{} - Unknown attribute with name '{}'. Add an element with this key to the list of attributes in a JSON file within directory '{}'.".format(e,name,self.meta.directory_path))
             raise AttributeError
+
+
+
+def check_boolean_property_value(object,key):
+    if key in object:
+        return object[key]
+    else:
+        return False
 
 class PreferencesWrapper:
     #All classes should have a settings object

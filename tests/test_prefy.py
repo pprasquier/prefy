@@ -47,7 +47,8 @@ class TestSettings(unittest.TestCase):
         with open(json_file2, "w") as file:  # Should be found and its settings should supersde those of file 1
             json.dump([
                 {"type": "Prefy", "key": "deactivate_setting_file", "value": False},
-                {"type": "Embeddings", "key": "insight_dir_path", "value": "/path2"}
+                {"type": "Embeddings", "key": "insight_dir_path", "value": "/path2"},
+                {"force_update": True, "key": "updateable_value", "value": "Obsolete value"}
             ], file)
         with open(json_file3, "w") as file: # Should be found but not loaded since it is deactivated
             json.dump([
@@ -67,6 +68,15 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(result.meta.files_loaded,2)
         self.assertTrue(result.boolean,"Failed to retrieve boolean value")
         self.assertEqual(result.number,4,"Failed to retrieve number value")
+        self.assertEqual(result.updateable_value,"Obsolete value")
+ 
+        with open(json_file2, "w") as file:  # Updating the json file without explicitly refreshing result
+            json.dump([
+                {"force_update": False, "key": "updateable_value", "value": "Updated value"}
+            ], file)   
+        print(result.updateable_value)    
+        self.assertEqual(result.updateable_value,"Updated value")
+                
         with self.assertRaises(AttributeError):
             result.inexisting_setting
             
