@@ -28,6 +28,11 @@ class Meta: #Info about this instance
             self.updateable_fields=[]
         
 class Preferences:    
+    def __iter__(self):
+        # Return an iterator over the non-meta attributes
+        attrs = {k: v for k, v in vars(self).items() if k != 'meta'}
+        return iter(attrs.items())
+    
     def __init__(self,directory_path=DEFAULT_DIR):
         try:
             if not os.path.isdir(directory_path):
@@ -131,7 +136,9 @@ class Preferences:
             return False
 
     def __repr__(self):
-        attributes = ", ".join(f"{key}={value}" for key, value in vars(self).items())
+        # Filter out special methods and only include regular attributes
+        attributes = ", ".join(f"{key}={value}" for key, value in vars(self).items() 
+                              if not (key.startswith('__') and key.endswith('__')))
         return f"{{{attributes}}}"
      
     def __getattribute__(self,name):
