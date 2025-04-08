@@ -1,1 +1,1 @@
-from .prefy import Preferences,PreferencesWrapper
+from .prefy import Preferences,PreferencesWrapper,PreferencesCollection
