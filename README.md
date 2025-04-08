@@ -127,10 +127,84 @@ vector_store=VectorStore(store_path=app_prefs.embeddings_path,sentence_transform
 ```
 
 # Addtional features
+
+## PreferencesCollection
+
+The `PreferencesCollection` class is designed to manage multiple sets of preferences, each represented by a `Preferences` object. This class allows you to organize and access different configurations (presumably, of the same format) easily.
+
+### Purpose
+
+- **Organize Preferences**: Manage multiple `Preferences` objects, each corresponding to a different directory of settings.
+- **Access by Key or Index**: Retrieve specific `Preferences` objects using directory names (keys) or their order of insertion (indices).
+- **Iterate and Inspect**: Easily iterate over all available preferences and inspect their configurations.
+
+### How It Works
+
+- **Initialization**: When you create a `PreferencesCollection`, it scans a specified parent directory for subdirectories. Each subdirectory is expected to contain JSON files defining preferences.
+- **Loading Preferences**: For each subdirectory, a `Preferences` object is instantiated, and all settings within that directory are loaded.
+- **Storage**: The `Preferences` objects are stored in a dictionary, with the subdirectory names as keys.
+
+### Usage
+
+1. **Import the Class**:
+   ```python
+   from prefy import PreferencesCollection
+   ```
+
+2. **Instantiate a PreferencesCollection:**
+   ```python
+   collection = PreferencesCollection('path/to/parent/directory')
+   ```
+
+3. **Access Preferences by Key:**
+   ```python
+    app_prefs = collection.get_by_key('app')
+   ```
+
+4. **Access Preferences by Index:**
+   ```python
+   first_prefs = collection.get_by_index(0)
+    ```
+
+5. **List All Keys:**
+   ```python
+    keys = collection.list_keys()
+    print(keys)  # Output: ['app', 'llm', ...]
+    ```
+
+6. **Iterate Over Preferences:**
+   ```python
+   for key, prefs in collection:
+   print(f"Preferences for {key}: {prefs}")
+   ```
+
+### Example
+
+Running a Prompt Against Multiple LLM Models
+Suppose you want to run the same prompt against a variety of LLM models. Instead of hard-coding all the different cases, you can create a single function that takes as input and iterates over an infinite number of preference files, each including the settings of the specific LLM you want to test.
+
+```python
+from prefy import PreferencesCollection
+
+def run_prompt_against_models(prompt, preferences_dir):
+    # Create a collection from a directory containing multiple LLM preference sets
+    collection = PreferencesCollection(preferences_dir)
+    
+    # Iterate over each set of preferences
+    for model_name, prefs in collection:
+        # Access the model-specific settings
+        model_url = prefs.insights_rag_base_url
+        model_name = prefs.insights_rag_model_name
+        
+        # Simulate running the prompt against the model
+        print(f"Running prompt against model '{model_name}' at '{model_url}'")
+```
+
 ### Excluding files manually
 Let's assume that I want to fix a bug that occurs with a specific set of preferences. Instead of changing my preferred preferences to replicte the but, I can simply create a new file with the appropriate preferences and give it the highest priority by giving it a filename starting with "ZZZ", for instance. When I'm done working with this configuration, an easy way to go back to my preferred preferences without losing the option to come back to this configuration in the future and preventing it from interfering with my regular preferences is to exclude this file from the **Preferences** instantiation process. 
 In order to do so, I'll add the following object to the file: 
- ```json
+
+``` json
      {
         "type":"Prefy",
         "key": "deactivate_setting_file",
@@ -138,6 +212,7 @@ In order to do so, I'll add the following object to the file:
         "value": true
     }
  ```   
+
 ### Restricing preferences changes
 WIP
 
