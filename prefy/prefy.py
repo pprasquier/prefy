@@ -52,7 +52,7 @@ class Preferences:
     #Finds the json files in the given directory and loads them into the instance's meta object
     def load_files(self):
         try:
-            self.meta.files = sorted([f for f in os.listdir(self.meta.directory_path) if f.endswith('.json')])
+            self.meta.files = sorted([f for f in os.listdir(self.meta.directory_path) if f.endswith('.json') or f.endswith('.txt')])
             self.meta.files_found = len(self.meta.files)
             if self.meta.files_found == 0:
                 logging.info("No JSON files found in '{}'.".format(self.meta.directory_path))
@@ -71,43 +71,55 @@ class Preferences:
                 self.load_files()
 
                 # Loop through each JSON file
-                for json_file_name in self.meta.files:
-                    filepath=os.path.join(self.meta.directory_path,json_file_name)
-                    targetFile=open(file=filepath, mode='r')
-                    content=targetFile.read()
-                    try:
-                        data = json.loads(content)
-                    except json.JSONDecodeError:
-                        logging.warning("Invalid JSON format in file '{}'.".format(filepath))
-                        continue
-                    
-                    # Check if the file should be skipped
-                    deactivate_setting = any(record.get(KEY) == DEACTIVATE and record.get(VALUE) == True
-                                            for record in data)
-                    if deactivate_setting:
-                        continue
-
-                    self.meta.files_loaded +=1
-                    # Process records other than type "Settiings"
-                    # TODO: Add logic to prevent overwriting existing settings when restricted=true 
-                    # TODO: Add logic to force update when force_update=true 
-                    for record in data:
+                for file_name in self.meta.files:
+                    if file_name.endswith('.txt'):
+                        filepath = os.path.join(self.meta.directory_path, file_name)
+                        with open(filepath, 'r') as file:
+                            content = file.read().strip()
+                            # Extract key from the file name
+                            base_name = os.path.basename(file_name)
+                            key = base_name.split('_', 1)[-1].replace(' ', '_').lower().replace('.txt', '')
+                            # Upsert the content as a preference
+                            self.__setattr__(key, content)
+                            self.meta.files_loaded +=1
+                    elif file_name.endswith('.json'):
+                        filepath=os.path.join(self.meta.directory_path,file_name)
+                        targetFile=open(file=filepath, mode='r')
+                        content=targetFile.read()
+                        try:
+                            data = json.loads(content)
+                        except json.JSONDecodeError:
+                            logging.warning("Invalid JSON format in file '{}'.".format(filepath))
+                            continue
                         
-                        # Add updateable settings to a list
-                        if check_boolean_property_value(record,FORCE_FIELD_UPDATE):
-                            self.meta.updateable_fields.append(record.get(KEY))
-                        else:
-                            try:
-                                self.meta.updateable_fields.remove(record.get(KEY))
-                            except ValueError:
-                                pass
+                        # Check if the file should be skipped
+                        deactivate_setting = any(record.get(KEY) == DEACTIVATE and record.get(VALUE) == True
+                                                for record in data)
+                        if deactivate_setting:
+                            continue
+
+                        self.meta.files_loaded +=1
+                        # Process records other than type "Settiings"
+                        # TODO: Add logic to prevent overwriting existing settings when restricted=true 
+                        # TODO: Add logic to force update when force_update=true 
+                        for record in data:
                             
-                        #Upsert settings to Preferences   
-                        if record.get(TYPE) != INTERNAL_SETTINGS: 
-                            key = record.get(KEY)
-                            value = record.get(VALUE)
-                            self.__setattr__(key, value)
-                    self.meta.instantiated=True
+                            # Add updateable settings to a list
+                            if check_boolean_property_value(record,FORCE_FIELD_UPDATE):
+                                self.meta.updateable_fields.append(record.get(KEY))
+                            else:
+                                try:
+                                    self.meta.updateable_fields.remove(record.get(KEY))
+                                except ValueError:
+                                    pass
+                                
+                            #Upsert settings to Preferences   
+                            if record.get(TYPE) != INTERNAL_SETTINGS: 
+                                key = record.get(KEY)
+                                value = record.get(VALUE)
+                                self.__setattr__(key, value)
+                        self.meta.instantiated=True
+                
         except FileNotFoundError:
             raise
         

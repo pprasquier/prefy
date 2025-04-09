@@ -200,7 +200,20 @@ def run_prompt_against_models(prompt, preferences_dir):
         print(f"Running prompt against model '{model_name}' at '{model_url}'")
 ```
 
-### Excluding files manually
+## Managing Long Values with .txt Files
+
+Prefy  supports the integration of `.txt` files for managing long values, such as prompt templates. This feature allows you to store lengthy content in separate text files, which are then automatically loaded and upserted into the `Preferences` object.
+
+### How It Works
+
+- **File Naming Convention**: Each `.txt` file should be named using the format `0_my_long_text.txt`, where the number before the first underscore (`_`) is optional. The part after the first underscore is used as the key, with spaces replaced by underscores and converted to lowercase. For example, a file named `5_First Prompt.txt` will have a key of `first_prompt`.
+
+- **Content as Value**: The content of each `.txt` file is read and stored as the value for the corresponding key in the `Preferences` object.
+
+- **Handling Conflicts**: If two files have the same name (ignoring the number before the first underscore), the file with the highest (alphabetical) number will be used. This allows for easy versioning and prioritization of settings.
+
+
+## Excluding files manually
 Let's assume that I want to fix a bug that occurs with a specific set of preferences. Instead of changing my preferred preferences to replicte the but, I can simply create a new file with the appropriate preferences and give it the highest priority by giving it a filename starting with "ZZZ", for instance. When I'm done working with this configuration, an easy way to go back to my preferred preferences without losing the option to come back to this configuration in the future and preventing it from interfering with my regular preferences is to exclude this file from the **Preferences** instantiation process. 
 In order to do so, I'll add the following object to the file: 
 
@@ -213,10 +226,10 @@ In order to do so, I'll add the following object to the file:
     }
  ```   
 
-### Restricing preferences changes
+## Restricing preferences changes
 WIP
 
-### Forcing updates
+## Forcing updates
 You can change the preferences on the fly without having to restart your app or worrying about specifying intervals or checkpoints to load data from the Preferences files. In order to do so, you just need to mark a setting as 
 ```json
 "force_update":true
@@ -224,12 +237,11 @@ You can change the preferences on the fly without having to restart your app or 
 This will trigger the update of the Preference object on which the setting is stored each time this setting is read accessed by your application.
 Be aware that this refreshes all settings to their most recent value and may add unnecessary load on your app, therefore only use it in scenarios where it is relevant.  
 
-### Environment variables integration
+## Environment variables integration
 WIP
 
 # Best practices
-Gitignore
-0 is for unignored preferences
+Files whose name starts with 0_ should be excluded from gitignore and be used as reference of all possible keys
 
 # Reserved key words
 The following must not be used as keys for your preferences: 

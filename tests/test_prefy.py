@@ -28,7 +28,7 @@ class TestSettings(unittest.TestCase):
     def test_auto_settings(self):
     # Create temporary directory and JSON files
 
-        tmpdirname=TEST_DIR_PATH
+        tmpdirname = TEST_DIR_PATH
         # Create JSON files
         json_file1 = os.path.join(tmpdirname, "1.settings1.json")
         json_file2 = os.path.join(tmpdirname, "2.settings2.json")
@@ -56,29 +56,41 @@ class TestSettings(unittest.TestCase):
                 ], file)
             with open(json_file4, "w") as file: # Should be found but not loaded since it is not a valid json file
                 file.write("Hello, World!\n")
-    
-            # Call the function
-            result = Preferences(tmpdirname)
-    
-            # Verify the result
-            self.assertEqual(result.insight_dir_path, "/path2")
-            self.assertEqual(result.resume_dir_path,"/path1")
-            self.assertEqual(result.meta.files_found,4)
-            self.assertEqual(result.meta.files_loaded,2)
-            self.assertTrue(result.boolean,"Failed to retrieve boolean value")
-            self.assertEqual(result.number,4,"Failed to retrieve number value")
-            self.assertEqual(result.updateable_value,"Obsolete value")
-     
-            with open(json_file2, "w") as file:  # Updating the json file without explicitly refreshing result
-                json.dump([
-                    {"force_update": False, "key": "updateable_value", "value": "Updated value"}
-                ], file)   
-            print(result.updateable_value)    
-            self.assertEqual(result.updateable_value,"Updated value")
-                    
-            with self.assertRaises(AttributeError):
-                result.inexisting_setting
-    
+
+        # Create .txt files
+        txt_file1 = os.path.join(tmpdirname, "5_first_prompt.txt")
+        txt_file2 = os.path.join(tmpdirname, "6_second_prompt.txt")
+        with open(txt_file1, "w") as file:
+            file.write("This is the first prompt.")
+        with open(txt_file2, "w") as file:
+            file.write("This is the second prompt.")
+
+        # Call the function
+        result = Preferences(tmpdirname)
+
+        # Verify .txt file content
+        self.assertEqual(result.first_prompt, "This is the first prompt.")
+        self.assertEqual(result.second_prompt, "This is the second prompt.")
+
+        # Verify the result
+        self.assertEqual(result.insight_dir_path, "/path2")
+        self.assertEqual(result.resume_dir_path, "/path1")
+        self.assertEqual(result.meta.files_found, 6)
+        self.assertEqual(result.meta.files_loaded, 4)
+        self.assertTrue(result.boolean, "Failed to retrieve boolean value")
+        self.assertEqual(result.number, 4, "Failed to retrieve number value")
+        self.assertEqual(result.updateable_value, "Obsolete value")
+
+        with open(json_file2, "w") as file:  # Updating the json file without explicitly refreshing result
+            json.dump([
+                {"force_update": False, "key": "updateable_value", "value": "Updated value"}
+            ], file)
+        print(result.updateable_value)
+        self.assertEqual(result.updateable_value, "Updated value")
+                
+        with self.assertRaises(AttributeError):
+            result.inexisting_setting
+        
     def test_create_preferences_collection_non_string_directory_path(self):
         with self.assertRaises(expected_exception=OSError):
             PreferencesCollection(12345)  # Passing a non-string directory path
