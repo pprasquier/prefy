@@ -66,8 +66,11 @@ class TestSettings(unittest.TestCase):
             file.write("This is the second prompt.")
 
         # Call the function
-        result = Preferences(tmpdirname)
-
+        result = Preferences(directory_path=tmpdirname,system_instructions="Test system instructions",
+    user_prompt="Test user prompt",str_output_parser='UnsupportedParser')
+        self.assertEqual(result.system_instructions, 'Test system instructions',"Failed to retrieve kwarg value 1")
+        self.assertEqual(result.str_output_parser, "UnsupportedParser","Failed to retrieve kwarg value 3")
+        
         # Verify .txt file content
         self.assertEqual(result.first_prompt, "This is the first prompt.")
         self.assertEqual(result.second_prompt, "This is the second prompt.")
@@ -123,5 +126,6 @@ class TestSettings(unittest.TestCase):
         actual_keys = set(collection.list_keys())
         self.assertEqual(actual_keys, expected_keys)       
             
+
     def tearDown(self):
         shutil.rmtree(TEST_DIR_PATH)

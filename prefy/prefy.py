@@ -33,14 +33,18 @@ class Preferences:
         attrs = {k: v for k, v in vars(self).items() if k != 'meta'}
         return iter(attrs.items())
     
-    def __init__(self,directory_path=DEFAULT_DIR):
+    def __init__(self, directory_path=DEFAULT_DIR, **kwargs):
         try:
             if not os.path.isdir(directory_path):
-                logging.error("Invalid directory: '{}'.".format(directory_path))
-                raise OSError   
-            self.meta=Meta()
-            self.meta.directory_path=directory_path
-            self.refresh(force_update=False)
+                logging.warning("Invalid directory: '{}'.".format(directory_path))
+            else: 
+                self.meta = Meta()
+                self.meta.directory_path = directory_path
+                self.refresh(force_update=False)
+            
+            # Load kwargs into the instance
+            for key, value in kwargs.items():
+                self.__setattr__(key, value)
           
         except OSError:
             raise
