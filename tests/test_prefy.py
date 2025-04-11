@@ -93,6 +93,12 @@ class TestSettings(unittest.TestCase):
                 
         with self.assertRaises(AttributeError):
             result.inexisting_setting
+     
+    def test_only_kwargs_passed(self):        
+            result = Preferences(bypass_directory=True, ad_hoc_prefs={"system_instructions":"Test system instructions",
+    "user_prompt":"Test user prompt","str_output_parser":'UnsupportedParser'})
+            self.assertEqual(result.system_instructions, 'Test system instructions',"Failed to retrieve kwarg value 1")
+            self.assertEqual(result.str_output_parser, "UnsupportedParser","Failed to retrieve kwarg value 3")
         
     def test_create_preferences_collection_non_string_directory_path(self):
         with self.assertRaises(expected_exception=OSError):
