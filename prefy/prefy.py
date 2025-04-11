@@ -26,28 +26,56 @@ class Meta: #Info about this instance
             self.files_found=0
             self.files_loaded=0
             self.updateable_fields=[]
-        
+
+
 class Preferences:    
+    # This class is used to load and manage settings from JSON files in a specified directory.
+    # It allows for dynamic loading of settings and provides methods to access and update them.
+    # It also supports automatic settings loading based on the presence of certain files and directories.
     def __iter__(self):
         # Return an iterator over the non-meta attributes
         attrs = {k: v for k, v in vars(self).items() if k != 'meta'}
         return iter(attrs.items())
     
-    def __init__(self,directory_path=DEFAULT_DIR):
-        try:
-            if not os.path.isdir(directory_path):
-                logging.error("Invalid directory: '{}'.".format(directory_path))
-                raise OSError   
-            self.meta=Meta()
-            self.meta.directory_path=directory_path
-            self.refresh(force_update=False)
-          
+    def __init__(self, directory_path=DEFAULT_DIR, bypass_directory=False, ad_hoc_prefs=None, **kwargs):
+        """
+        Initializes a Preferences instance, loading settings from JSON and txt files in the specified directory.
+
+        Parameters:
+        directory_path (str): The path to the directory containing the settings files. Defaults to 'settings_files'.
+        bypass_directory (bool): If True, bypasses the directory and only loads the kwargs. Defaults to False.
+        ad_hoc_prefs: A dictionary or list of tuples of ad-hoc preferences to set as attributes on the instance. Defaults to None.
+        **kwargs: Additional keyword arguments to set as attributes on the instance. Useful for testing purposes.
+
+        Raises:
+        OSError: If the specified directory path is invalid.
+        Exception: For any other errors encountered during initialization.
+        """
+        try:    
+            self.meta = Meta()        
+            if not bypass_directory:
+                if not os.path.isdir(directory_path):
+                    logging.warning("Invalid directory: '{}'.".format(directory_path))
+                    raise OSError("Invalid directory: '{}'.".format(directory_path))
+                
+                self.meta.directory_path = directory_path
+                self.refresh(force_update=False)
+            
+            if ad_hoc_prefs is not None:
+                self.set_ad_hoc_prefs(ad_hoc_prefs=ad_hoc_prefs)
+                
+            if kwargs:
+                for key, value in kwargs.items():
+                    self.__setattr__(key, value)
+                    self.meta.instantiated=True
+            
+                
         except OSError:
             raise
         
         except Exception as e:
             logging.error('Error {} .'.format(e))
-            raise Exception      
+            raise Exception
 
     #Finds the json files in the given directory and loads them into the instance's meta object
     def load_files(self):
@@ -140,6 +168,16 @@ class Preferences:
             logging.error('Error {} .'.format(e))
             raise Exception
         
+    def set_ad_hoc_prefs(self, ad_hoc_prefs):
+        # Set attributes from kwargs
+        if not isinstance(ad_hoc_prefs, dict):
+            for key, value in ad_hoc_prefs:
+                self.__setattr__( key, value)
+        else:
+            for key, value in ad_hoc_prefs.items():
+                self.__setattr__(key, value)
+        self.meta.instantiated=True
+
     def check_attribute_updateable(self, name):
         if name in self.meta.updateable_fields:
             self.refresh(force_update=True)
@@ -155,7 +193,7 @@ class Preferences:
      
     def __getattribute__(self,name):
         try:
-            if name != 'meta' and name != 'check_attribute_updateable':
+            if name != 'meta' and name != 'check_attribute_updateable' and self.meta.instantiated==True:
                 self.check_attribute_updateable(name)
             return super().__getattribute__(name)
         except Exception as e:
