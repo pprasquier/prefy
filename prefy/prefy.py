@@ -244,9 +244,9 @@ class PreferencesCollection:
         return [item.name for item in self.items]
 
     def __iter__(self):
-        # Return an iterator over the Preferences objects in the collection
+        # Return an iterator over the Collection item objects in the collection
         for item in self.items:
-            yield item.preferences
+            yield item
 
     def __len__(self):
         return len(self.items)

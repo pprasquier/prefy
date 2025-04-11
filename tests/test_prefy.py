@@ -114,7 +114,10 @@ class TestSettings(unittest.TestCase):
         for dir_name in test_dirs:
             json_file = os.path.join(dir_name, "settings.json")
             with open(json_file, "w") as file:
-                json.dump([{"type": "Embeddings", "key": "example_key", "value": "example_value"}], file)
+                json.dump([
+                    {"type": "Embeddings", "key": "example_key", "value": "example_value"},
+                    {"type": "Metadata", "key": "file_name", "value": os.path.basename(dir_name)}
+                ], file)
         
         # Instantiate the PreferencesCollection
         collection = PreferencesCollection('temp')
@@ -136,7 +139,15 @@ class TestSettings(unittest.TestCase):
         
         # Access the first item by index
         first_preferences = collection.get_by_index(0)
-        self.assertEqual(first_preferences.example_key, "example_value")            
+        self.assertEqual(first_preferences.example_key, "example_value")   
+        
+        # Assert that the number of unique item.file_name values is equal to the number of directories
+        unique_file_names = set({item.preferences.file_name for item in collection})
+        self.assertEqual(len(unique_file_names), len(test_dirs), "The number of unique file_name values does not match the number of directories.")
+        
+        # Assert that the file_name of each item.preferences in collection corresponds to its item.name
+        for item in collection:
+            self.assertEqual(item.preferences.file_name, item.name, f"File name mismatch for {item.name}. Expected {item.name}, got {item.preferences.file_name}.")     
 
     def tearDown(self):
         shutil.rmtree(TEST_DIR_PATH)

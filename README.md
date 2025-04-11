@@ -163,19 +163,19 @@ The `PreferencesCollection` class is designed to manage multiple sets of prefere
 
 4. **Access Preferences by Index:**
    ```python
-   first_prefs = collection.get_by_index(0)
+   first_prefs = collection.get_by_index(0).preferences
     ```
 
 5. **List All Keys:**
    ```python
-    keys = collection.list_keys()
+    keys = collection.list_names()
     print(keys)  # Output: ['app', 'llm', ...]
     ```
 
 6. **Iterate Over Preferences:**
    ```python
-   for key, prefs in collection:
-   print(f"Preferences for {key}: {prefs}")
+   for item in collection:
+       print(f"Preferences for {item.name}: {item.preferences}")
    ```
 
 ### Example
