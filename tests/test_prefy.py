@@ -119,19 +119,24 @@ class TestSettings(unittest.TestCase):
         # Instantiate the PreferencesCollection
         collection = PreferencesCollection('temp')
         
-        # Verify the result
-        self.assertEqual(set(collection.settings_dict.keys()), {os.path.basename(d) for d in test_dirs})
-        self.assertEqual(collection.get_by_key('dir1').example_key, "example_value")
+        # Verify that the collection contains the right keys
+        self.assertEqual(len(collection), len(test_dirs), "The number of keys in the collection does not match the number of directories.")
+        
+        # Test the get_by_key method
+        self.assertEqual(collection.get_by_name('dir1').example_key, "example_value")
+        
+        # Test the get_by_index method
+        first_preferences = collection.get_by_index(0)
+        self.assertEqual(first_preferences.example_key, "example_value")
+        
+        # Test the list_keys method
+        expected_keys = {os.path.basename(d) for d in test_dirs}
+        actual_keys = set(collection.list_names())
+        self.assertEqual(actual_keys, expected_keys)
         
         # Access the first item by index
         first_preferences = collection.get_by_index(0)
-        self.assertEqual(first_preferences.example_key, "example_value")
- 
-        # Test the list_keys method
-        expected_keys = {os.path.basename(d) for d in test_dirs}
-        actual_keys = set(collection.list_keys())
-        self.assertEqual(actual_keys, expected_keys)       
-            
+        self.assertEqual(first_preferences.example_key, "example_value")            
 
     def tearDown(self):
         shutil.rmtree(TEST_DIR_PATH)

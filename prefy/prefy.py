@@ -200,45 +200,56 @@ class Preferences:
             logging.warning("{} - Unknown attribute with name '{}'. Add an element with this key to the list of attributes in a JSON file within directory '{}'.".format(e,name,self.meta.directory_path))
             raise AttributeError
 
+class CollectionItem:
+    def __init__(self, name:str, preferences:Preferences):
+        self.name = name
+        self.preferences = preferences
+
 class PreferencesCollection:
     def __init__(self, directory_path):
         if not os.path.isdir(directory_path):
             logging.error("Invalid directory: '{}'.".format(directory_path))
             raise OSError("Invalid directory: '{}'.".format(directory_path))
         
-        self.settings_dict = {}
+        self.items: list[CollectionItem] = []
         # Get all subdirectories in the parent directory
         for directory in [os.path.join(directory_path, d) for d in os.listdir(directory_path) if os.path.isdir(os.path.join(directory_path, d))]:
             if not os.path.isdir(directory):
                 logging.error("Invalid directory: '{}'.".format(directory))
                 raise OSError("Invalid directory: '{}'.".format(directory))
             
-            settings = Preferences(directory_path=directory)
+            preferences = Preferences(directory_path=directory)
             name = os.path.basename(directory)
-            self.settings_dict[name] = settings
+            item=CollectionItem(name, preferences)
+            self.items.append(item)
 
-    def get_by_key(self, key):
-        return self.settings_dict.get(key)
+    def get_by_name(self, name):
+        # Return a specific Preferences object by name
+        for item in self.items:
+            if item.name == name:
+                return item.preferences
+        logging.error("Preferences object not found with name '{}'.".format(name))
+        raise KeyError("Preferences object not found with name '{}'.".format(name))
 
     def get_by_index(self, index):
-        try:
-            key = list(self.settings_dict.keys())[index]
-            return self.settings_dict[key]
-        except IndexError:
-            logging.error("Index out of range.")
-            raise IndexError("Index out of range.")
+        # Return a specific Preferences object by index
+        if index < len(self.items):
+            return self.items[index].preferences
+        else:
+            logging.error("Index out of range: '{}'.".format(index))
+            raise IndexError("Index out of range: '{}'.".format(index))
 
-    def list_keys(self):
-        return list(self.settings_dict.keys())
+    def list_names(self):
+        # Return a list of names of all Preferences objects in the collection
+        return [item.name for item in self.items]
 
     def __iter__(self):
-        return iter(self.settings_dict.items())
+        # Return an iterator over the Preferences objects in the collection
+        for item in self.items:
+            yield item.preferences
 
     def __len__(self):
-        return len(self.settings_dict)
-
-    def __getitem__(self, key):
-        return self.settings_dict[key]
+        return len(self.items)
 
 def check_boolean_property_value(object,key):
     if key in object:
