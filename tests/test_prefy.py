@@ -149,5 +149,17 @@ class TestSettings(unittest.TestCase):
         for item in collection:
             self.assertEqual(item.preferences.file_name, item.name, f"File name mismatch for {item.name}. Expected {item.name}, got {item.preferences.file_name}.")     
 
+    def test_attribute_access_with_allow_missing_attributes_true(self):
+        allowed_missing_attributes = Preferences( bypass_directory=True, ad_hoc_prefs={"test":"value"},allow_missing_attributes=True)
+        
+        # Test accessing an attribute that does not exist in the JSON files
+        self.assertIsNone(allowed_missing_attributes.non_existent_attribute, "Non-existent attribute should return None")
+
+        disallowed_missing_attributes = Preferences(bypass_directory=True, ad_hoc_prefs={"test":"value"},allow_missing_attributes=False)
+        # Test accessing an attribute that exists in the JSON files
+        with self.assertRaises(expected_exception=AttributeError):
+            disallowed_missing_attributes.non_existent_attribute # Passing a non-string directory path
+
+
     def tearDown(self):
         shutil.rmtree(TEST_DIR_PATH)

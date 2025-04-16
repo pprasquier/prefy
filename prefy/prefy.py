@@ -37,7 +37,7 @@ class Preferences:
         attrs = {k: v for k, v in vars(self).items() if k != 'meta'}
         return iter(attrs.items())
     
-    def __init__(self, directory_path=DEFAULT_DIR, bypass_directory=False, ad_hoc_prefs=None, **kwargs):
+    def __init__(self, directory_path=DEFAULT_DIR, bypass_directory=False, ad_hoc_prefs=None, allow_missing_attributes=False,**kwargs):
         """
         Initializes a Preferences instance, loading settings from JSON and txt files in the specified directory.
 
@@ -45,6 +45,7 @@ class Preferences:
         directory_path (str): The path to the directory containing the settings files. Defaults to 'settings_files'.
         bypass_directory (bool): If True, bypasses the directory and only loads the kwargs. Defaults to False.
         ad_hoc_prefs: A dictionary or list of tuples of ad-hoc preferences to set as attributes on the instance. Defaults to None.
+        allow_missing_attributes: (bool): If True, allows missing attributes without raising an error. Defaults to False.
         **kwargs: Additional keyword arguments to set as attributes on the instance. Useful for testing purposes.
 
         Raises:
@@ -63,6 +64,8 @@ class Preferences:
             
             if ad_hoc_prefs is not None:
                 self.set_ad_hoc_prefs(ad_hoc_prefs=ad_hoc_prefs)
+                
+            self.allow_missing_attributes = allow_missing_attributes
                 
             if kwargs:
                 for key, value in kwargs.items():
@@ -198,7 +201,10 @@ class Preferences:
             return super().__getattribute__(name)
         except Exception as e:
             logging.warning("{} - Unknown attribute with name '{}'. Add an element with this key to the list of attributes in a JSON file within directory '{}'.".format(e,name,self.meta.directory_path))
-            raise AttributeError
+            if self.allow_missing_attributes:
+                return None
+            else:
+                raise AttributeError
 
 class CollectionItem:
     def __init__(self, name:str, preferences:Preferences):
