@@ -212,7 +212,7 @@ class CollectionItem:
         self.preferences = preferences
 
 class PreferencesCollection:
-    def __init__(self, directory_path):
+    def __init__(self, directory_path,allow_missing_attributes=False):
         if not os.path.isdir(directory_path):
             logging.error("Invalid directory: '{}'.".format(directory_path))
             raise OSError("Invalid directory: '{}'.".format(directory_path))
@@ -224,7 +224,7 @@ class PreferencesCollection:
                 logging.error("Invalid directory: '{}'.".format(directory))
                 raise OSError("Invalid directory: '{}'.".format(directory))
             
-            preferences = Preferences(directory_path=directory)
+            preferences = Preferences(directory_path=directory,allow_missing_attributes=allow_missing_attributes)
             name = os.path.basename(directory)
             item=CollectionItem(name, preferences)
             self.items.append(item)
